@@ -1,43 +1,32 @@
 import express from "express";
 import bodyParser from "body-parser";
+import { protect } from "./modules/auth";
+import cors from 'cors'
+import morgan from 'morgan'
+import router from "./routes";
+
 
 const app = express();
 const PORT = 5000;
 
+app.use(cors())
+app.use(morgan('dev'))
+
 // Middleware to parse JSON requests
 app.use(bodyParser.json())
 
-let todos = []; // In-memory database
-let idCounter = 1; // To track unique IDs
 
 // Create a To-Do (POST)
-app.post("/todos", (req, res) => {
-    const {task} = req.body
-
-    if (!task) {
-        return res.status(400).json({ message: "Task is required" });
-    }
-
-    const newTodo = { id: idCounter++, task };
-    todos.push(newTodo);
-    res.status(201).json(newTodo);
 
 
-});
+// home page
 
-// Get all To-Dos (GET)
-app.get("/todos", (req, res) => {
-    res.json(todos);
-});
-
-app.get("/todos/:id", (req,res)=> {
-    const todo = todos.find( todo => todo.id === parseInt(req.params.id))
-
-    if(!todo){
-        res.send(404).json({message: 'todo not found'})
-    }
-    res.json(todo)
+app.get("/", (req, res)=>{
+    res.json({message: 'Hello, welcome to the app'})
 })
 
+
+
+app.use('/api', protect, router)
 
 export default app
